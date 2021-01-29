@@ -1,9 +1,13 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import BubblePage from "./BubblePage";
+import { fetchColors as MockFetchColors } from '../api/fetchColors'
+jest.mock('../api/fetchColors');
 
 test("Renders BubblePage without errors", () => {
-
+  MockFetchColors.mockResolvedValueOnce({
+    data: fakeData
+  });
     // Arrange - render page
   const { getByText } = render (<BubblePage />)
 
@@ -16,21 +20,23 @@ test("Renders BubblePage without errors", () => {
   expect(colorsTitle).toBeInTheDocument();
 })
 
-test("Fetches data and renders the bubbles on mounting", () => {
-  //Arrange - render page and make sure there are no colors listed and no bubbles rendered
-  const { rerender, queryAllByTestId, getAllByTestId } = render(<BubblePage />);
-  const noColors = queryAllByTestId('color');
-  const noBubbles = queryAllByTestId('bubble');
-  expect(noColors).toHaveLength(0);
-  expect(noBubbles).toHaveLength(0);
+test("Fetches data and renders the bubbles on mounting", async () => {
+  MockFetchColors.mockResolvedValueOnce({
+    data: fakeData
+  });
 
-    //Act - rerender with fake data
-    rerender(<BubblePage colorList={data}/>)
-    const colors = screen.getAllByTestId('color');
+  //Arrange - render page and make sure there are no colors listed and no bubbles rendered
+  const { getAllByTestId } = render(<BubblePage />);
+
+    //Act - wait for useEffect
+    await waitFor(()=>{
+      //Assert - check if there are 8 bubbles
+      expect (getAllByTestId('bubble')).toHaveLength(8);
+    })
 
 })
 
-const data = [
+const fakeData = [
   {
     "color": "aliceblue",
     "code": {
