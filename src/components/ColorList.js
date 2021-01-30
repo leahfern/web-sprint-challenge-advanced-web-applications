@@ -40,7 +40,6 @@ const ColorList = ({ colors, updateColors }) => {
     axiosWithAuth()
       .delete(`/colors/${color.id}`)
       .then(res => {
-        console.log(res)
         updateColors(colors.filter(color => color.id !== parseInt(res.data, 10)))
       })
       .catch(err => console.log(err))
